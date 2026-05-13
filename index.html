@@ -284,6 +284,7 @@
     #cv-preview .lang-line .sep { margin: 0 5px; color: #555; }
 
     @media print {
+      @page { margin: 0; size: A4; }
       body * { visibility: hidden; }
       #cv-preview, #cv-preview * { visibility: visible; }
       #cv-preview {
@@ -297,6 +298,32 @@
         font-size: 8.4pt;
       }
     }
+
+    /* Barre de formatage */
+    .format-bar {
+      display: none;
+      align-items: center;
+      gap: 4px;
+      padding: 5px 18px;
+      background: #f9f9f9;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    .format-bar.visible { display: flex; }
+    .format-bar span { font-size: 10px; color: #888; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-right: 4px; }
+    .btn-fmt {
+      padding: 4px 10px;
+      border-radius: 5px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1.5px solid #ddd;
+      background: #fff;
+      color: #1a1a1a;
+      line-height: 1;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .btn-fmt:hover { border-color: #1a1a1a; background: #f0f0f0; }
+    .btn-fmt.active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
   </style>
 </head>
 <body>
@@ -356,6 +383,13 @@
         </svg>
         Exporter PDF
       </button>
+    </div>
+    <div class="format-bar" id="format-bar">
+      <span>Formatage :</span>
+      <button class="btn-fmt" id="fmt-bold" onclick="fmt('bold')" title="Gras (Ctrl+B)"><b>G</b></button>
+      <button class="btn-fmt" id="fmt-italic" onclick="fmt('italic')" title="Italique (Ctrl+I)"><i>I</i></button>
+      <button class="btn-fmt" onclick="fmt('underline')" title="Souligné (Ctrl+U)"><u>S</u></button>
+      <button class="btn-fmt" onclick="fmt('removeFormat')" title="Supprimer le formatage">✕</button>
     </div>
     <div class="preview-wrap">
       <div id="cv-preview">
@@ -439,6 +473,8 @@ INFORMATIONS FIXES (toujours inclure telles quelles) :
 - Nom : Yohan MULUKA | Tél : +33 6 37 10 99 54 | Email : YOHAN.MULUKA@EPITA.FR
 - Localisation : Île-de-France | Permis B
 - Contrat : Contrat d'apprentissage : 36 mois – Rythme : 2 sem. / 2 sem. – Dès septembre 2026
+
+CONTRAINTE BULLETS : maximum 3 bullets par expérience pour Everysens, maximum 2 bullets pour les autres expériences. Chaque bullet doit être percutant et synthétique.
 
 RÉPONDS UNIQUEMENT avec ce JSON (aucun texte en dehors) :
 {
@@ -614,6 +650,7 @@ function setEditMode(active) {
   const preview = document.getElementById('cv-preview');
   const btn = document.getElementById('btn-edit');
   const badge = document.getElementById('edit-badge');
+  const fbar = document.getElementById('format-bar');
 
   preview.contentEditable = active ? 'true' : 'false';
   if (active) preview.focus();
@@ -621,7 +658,23 @@ function setEditMode(active) {
   btn.textContent = active ? 'Terminer' : 'Modifier';
   btn.classList.toggle('edit-active', active);
   badge.style.display = active ? 'inline' : 'none';
+  fbar.classList.toggle('visible', active);
 }
+
+function fmt(cmd) {
+  document.execCommand(cmd, false, null);
+  document.getElementById('cv-preview').focus();
+  // Mettre à jour l'état actif des boutons
+  document.getElementById('fmt-bold').classList.toggle('active', document.queryCommandState('bold'));
+  document.getElementById('fmt-italic').classList.toggle('active', document.queryCommandState('italic'));
+}
+
+// Mettre à jour l'état des boutons lors de la sélection
+document.addEventListener('selectionchange', () => {
+  if (!editMode) return;
+  document.getElementById('fmt-bold').classList.toggle('active', document.queryCommandState('bold'));
+  document.getElementById('fmt-italic').classList.toggle('active', document.queryCommandState('italic'));
+});
 
 function showError(msg) {
   const box = document.getElementById('alert-error');
