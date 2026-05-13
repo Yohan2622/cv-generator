@@ -390,6 +390,11 @@
       <button class="btn-fmt" id="fmt-italic" onclick="fmt('italic')" title="Italique (Ctrl+I)"><i>I</i></button>
       <button class="btn-fmt" onclick="fmt('underline')" title="Souligné (Ctrl+U)"><u>S</u></button>
       <button class="btn-fmt" onclick="fmt('removeFormat')" title="Supprimer le formatage">✕</button>
+      <div style="width:1px;height:18px;background:#ddd;margin:0 4px;"></div>
+      <span>Taille :</span>
+      <button class="btn-fmt" onclick="changeFontSize(-0.3)" title="Réduire la taille">A−</button>
+      <button class="btn-fmt" onclick="changeFontSize(0.3)" title="Augmenter la taille">A+</button>
+      <span id="font-size-label" style="font-size:11px;color:#555;min-width:32px;text-align:center;"></span>
     </div>
     <div class="preview-wrap">
       <div id="cv-preview">
@@ -478,7 +483,7 @@ CONTRAINTE BULLETS : maximum 3 bullets par expérience pour Everysens, maximum 2
 
 CONTRAINTE ACCROCHE : L'accroche doit obligatoirement respecter cette structure en 3 phrases validée par les recruteurs RH :
 1. PHRASE D'ANCRAGE : Qui es-tu + ton niveau de formation actuel. Mentionner OBLIGATOIREMENT que Yohan intègre le cycle ingénieur à EPITA en septembre 2026 (école d'ingénieurs en informatique reconnue) et qu'il a déjà 2 ans d'expérience en alternance chez Everysens (SaaS transport ferroviaire).
-2. PHRASE DE VALEUR : Ce que tu apportes concrètement au poste, en reprenant 2-3 mots-clés exacts de la fiche de poste et en citant un résultat chiffré issu de la base (ex: ÷4 sur le temps de traitement, +20% productivité).
+2. PHRASE DE VALEUR : Ce que tu apportes concrètement au poste, en reprenant 2-3 mots-clés exacts de la fiche de poste. Tu peux mentionner un résultat chiffré de façon sobre si pertinent (ex: +20% de productivité), mais sans entrer dans les détails techniques. Reste à un niveau de lecture accessible pour un RH non-technique.
 3. PHRASE DE MOTIVATION : Pourquoi ce poste/cette entreprise spécifiquement, en lien avec le secteur ou la mission. Sobre, sans formulation creuse.
 L'accroche doit faire 3-4 lignes maximum, être justifiée et professionnelle.
 
@@ -681,14 +686,29 @@ function setEditMode(active) {
   btn.classList.toggle('edit-active', active);
   badge.style.display = active ? 'inline' : 'none';
   fbar.classList.toggle('visible', active);
+  if (active) initFontSizeLabel();
 }
 
 function fmt(cmd) {
   document.execCommand(cmd, false, null);
   document.getElementById('cv-preview').focus();
-  // Mettre à jour l'état actif des boutons
   document.getElementById('fmt-bold').classList.toggle('active', document.queryCommandState('bold'));
   document.getElementById('fmt-italic').classList.toggle('active', document.queryCommandState('italic'));
+}
+
+// Taille globale du CV
+let currentFontSize = 8.4;
+
+function changeFontSize(delta) {
+  currentFontSize = Math.round((currentFontSize + delta) * 10) / 10;
+  currentFontSize = Math.max(6, Math.min(12, currentFontSize));
+  const preview = document.getElementById('cv-preview');
+  preview.style.fontSize = currentFontSize + 'pt';
+  document.getElementById('font-size-label').textContent = currentFontSize + 'pt';
+}
+
+function initFontSizeLabel() {
+  document.getElementById('font-size-label').textContent = currentFontSize + 'pt';
 }
 
 // Mettre à jour l'état des boutons lors de la sélection
