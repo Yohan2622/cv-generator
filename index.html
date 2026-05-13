@@ -271,6 +271,7 @@
     #cv-preview ul.bul { list-style: disc; padding-left: 12px; }
     #cv-preview ul.bul li { font-size: 7.9pt; line-height: 1.44; margin-bottom: 1px; text-align: justify; }
     #cv-preview ul.bul li b { font-weight: 700; }
+    #cv-preview ul.bul li .kw { font-weight: 700; font-style: italic; color: #111; }
     #cv-preview .ftable { width: 100%; border-collapse: collapse; }
     #cv-preview .ftable tr { vertical-align: top; }
     #cv-preview .ftable td.fl { width: 82%; padding-bottom: 4px; }
@@ -479,7 +480,18 @@ INFORMATIONS FIXES (toujours inclure telles quelles) :
 - Localisation : Île-de-France | Permis B
 - Contrat : Contrat d'apprentissage : 36 mois – Rythme : 2 sem. / 2 sem. – Dès septembre 2026
 
-CONTRAINTE BULLETS : maximum 3 bullets par expérience pour Everysens, maximum 2 bullets pour les autres expériences. Chaque bullet doit être percutant et synthétique.
+CONTRAINTE BULLETS : maximum 3 bullets par expérience pour Everysens, maximum 2 bullets pour les autres expériences.
+
+STRUCTURE OBLIGATOIRE DE CHAQUE BULLET :
+Chaque bullet doit suivre ce format exact : "<b>Titre d'action court :</b> Explication claire en texte normal avec les mots-clés techniques encadrés dans <span class=\"kw\">...</span>."
+Exemple : "<b>Automatisation & Traitement :</b> Développement de scripts (<span class=\"kw\">Python</span>, <span class=\"kw\">SQL</span>) pour extraire et fiabiliser les flux de données."
+Les mots-clés techniques à mettre en évidence sont : noms de langages (Python, SQL, Java...), outils (Streamlit, Power BI, Git, Jira, Postman...), concepts techniques (API REST, ETL, RGPD, Auth0, IoT...).
+Le titre doit être court (2-4 mots), percutant, en rapport avec l'action réalisée.
+
+INTERDIT dans les bullets :
+- Le caractère "&" seul ou sous forme "&amp;" : utilise "et" à la place dans le texte courant. Dans les titres en gras uniquement, tu peux utiliser "&" s'il fait partie d'un titre court (ex: "Qualité & Gouvernance").
+- Les tirets longs " — "
+- Les formulations creuses ou "IA"
 
 CONTRAINTE ACCROCHE : L'accroche doit obligatoirement respecter cette structure en 3 phrases validée par les recruteurs RH :
 1. PHRASE D'ANCRAGE : Qui es-tu + ton niveau de formation actuel. Mentionner OBLIGATOIREMENT que Yohan intègre le cycle ingénieur à EPITA en septembre 2026 (école d'ingénieurs en informatique reconnue) et qu'il a déjà 2 ans d'expérience en alternance chez Everysens (SaaS transport ferroviaire).
