@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CV Generator – Yohan MULUKA</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f4f4f6;
+      color: #1a1a1a;
+      min-height: 100vh;
+    }
+
+    /* ── TOP BAR ── */
+    .topbar {
+      background: #1a1a1a;
+      color: #fff;
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .topbar .logo { font-size: 18px; font-weight: 700; letter-spacing: 1px; }
+    .topbar .sub { font-size: 12px; color: #aaa; margin-left: auto; }
+
+    /* ── LAYOUT ── */
+    .container {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 0;
+      height: calc(100vh - 52px);
+    }
+
+    /* ── LEFT PANEL ── */
+    .panel-left {
+      background: #fff;
+      border-right: 1px solid #e0e0e0;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    .panel-section {
+      padding: 20px 22px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .panel-section h3 {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #888;
+      margin-bottom: 10px;
+    }
+
+    .api-input-wrap {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    input[type="password"], input[type="text"] {
+      flex: 1;
+      padding: 9px 12px;
+      border: 1.5px solid #ddd;
+      border-radius: 7px;
+      font-size: 13px;
+      font-family: monospace;
+      outline: none;
+      transition: border 0.2s;
+    }
+    input:focus { border-color: #1a1a1a; }
+
+    .btn-save {
+      padding: 9px 14px;
+      background: #1a1a1a;
+      color: #fff;
+      border: none;
+      border-radius: 7px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .btn-save:hover { background: #333; }
+
+    .api-status {
+      font-size: 11px;
+      margin-top: 6px;
+      color: #888;
+    }
+    .api-status.ok { color: #2e7d32; }
+    .api-status.err { color: #c62828; }
+
+    textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1.5px solid #ddd;
+      border-radius: 7px;
+      font-size: 13px;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      resize: vertical;
+      outline: none;
+      line-height: 1.5;
+      transition: border 0.2s;
+    }
+    textarea:focus { border-color: #1a1a1a; }
+
+    #job-input { min-height: 200px; }
+
+    .btn-generate {
+      width: 100%;
+      padding: 13px;
+      background: #1a1a1a;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+      transition: background 0.2s, transform 0.1s;
+      margin-top: 4px;
+    }
+    .btn-generate:hover { background: #333; }
+    .btn-generate:active { transform: scale(0.98); }
+    .btn-generate:disabled { background: #aaa; cursor: not-allowed; }
+
+    .spinner {
+      display: none;
+      width: 18px; height: 18px;
+      border: 2px solid #fff;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin: 0 auto;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .btn-generate.loading .btn-text { display: none; }
+    .btn-generate.loading .spinner { display: block; }
+
+    .info-box {
+      background: #f8f8f8;
+      border-radius: 7px;
+      padding: 10px 12px;
+      font-size: 12px;
+      color: #555;
+      line-height: 1.6;
+    }
+    .info-box a { color: #1a1a1a; font-weight: 600; }
+
+    /* ── RIGHT PANEL ── */
+    .panel-right {
+      display: flex;
+      flex-direction: column;
+      background: #e8e8ec;
+      overflow: hidden;
+    }
+
+    .preview-toolbar {
+      background: #fff;
+      border-bottom: 1px solid #e0e0e0;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .preview-toolbar span {
+      font-size: 13px;
+      font-weight: 600;
+      color: #444;
+      flex: 1;
+    }
+
+    .btn-print {
+      padding: 8px 18px;
+      background: #1a1a1a;
+      color: #fff;
+      border: none;
+      border-radius: 7px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .btn-print:hover { background: #333; }
+    .btn-print:disabled { background: #aaa; cursor: not-allowed; }
+
+    .btn-copy {
+      padding: 8px 14px;
+      background: #fff;
+      color: #1a1a1a;
+      border: 1.5px solid #ddd;
+      border-radius: 7px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-copy:hover { border-color: #1a1a1a; }
+    .btn-copy:disabled { color: #aaa; border-color: #eee; cursor: not-allowed; }
+
+    .preview-wrap {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 24px;
+    }
+
+    #cv-preview {
+      width: 210mm;
+      min-height: 297mm;
+      background: #fff;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+      padding: 9mm 13mm 8mm 13mm;
+      font-family: 'Montserrat', 'Helvetica Neue', Arial, sans-serif;
+      font-size: 8.4pt;
+      color: #111;
+      position: relative;
+    }
+
+    .placeholder-msg {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      color: #ccc;
+    }
+    .placeholder-msg .icon { font-size: 48px; margin-bottom: 12px; }
+    .placeholder-msg p { font-size: 14px; }
+
+    /* ── ALERTS ── */
+    .alert-box {
+      display: none;
+      margin: 0 22px 12px 22px;
+      padding: 10px 14px;
+      border-radius: 7px;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+    .alert-box.warning {
+      background: #fff8e1;
+      border-left: 3px solid #f9a825;
+      color: #5d4037;
+    }
+    .alert-box.error {
+      background: #ffebee;
+      border-left: 3px solid #c62828;
+      color: #c62828;
+    }
+
+    /* ── CV STYLES (injectés dans le preview) ── */
+    #cv-preview .cv-header { text-align: center; margin-bottom: 3px; }
+    #cv-preview .cv-header h1 { font-size: 24pt; font-weight: 400; letter-spacing: 0.5px; line-height: 1.1; }
+    #cv-preview .cv-header h1 .ln { font-weight: 800; }
+    #cv-preview .cv-header .title { font-size: 9.5pt; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; margin-top: 2px; }
+    #cv-preview .cv-header .contract { font-size: 7.2pt; font-weight: 400; letter-spacing: 0.3px; text-transform: uppercase; margin-top: 1px; }
+    #cv-preview .cv-header .contact { font-size: 7.8pt; font-weight: 400; margin-top: 3px; }
+    #cv-preview .cv-header .contact span { margin: 0 4px; color: #555; }
+    #cv-preview .hline { border: none; border-top: 1.2px solid #111; margin: 3px 0; }
+    #cv-preview .accroche { font-size: 7.9pt; line-height: 1.48; text-align: justify; margin: 4px 0 5px 0; }
+    #cv-preview .section { margin-bottom: 5px; }
+    #cv-preview .section-title { font-size: 9.4pt; font-weight: 800; text-transform: uppercase; letter-spacing: 0.3px; border-bottom: 1.4px solid #111; padding-bottom: 2px; margin-bottom: 5px; }
+    #cv-preview .exp-block { margin-bottom: 5px; }
+    #cv-preview .exp-role { font-size: 8.4pt; font-weight: 700; text-transform: uppercase; margin-bottom: 1px; }
+    #cv-preview .exp-meta { font-size: 7.9pt; font-style: italic; margin-bottom: 2px; }
+    #cv-preview .exp-meta b { font-style: normal; font-weight: 700; }
+    #cv-preview ul.bul { list-style: disc; padding-left: 12px; }
+    #cv-preview ul.bul li { font-size: 7.9pt; line-height: 1.44; margin-bottom: 1px; text-align: justify; }
+    #cv-preview ul.bul li b { font-weight: 700; }
+    #cv-preview .ftable { width: 100%; border-collapse: collapse; }
+    #cv-preview .ftable tr { vertical-align: top; }
+    #cv-preview .ftable td.fl { width: 82%; padding-bottom: 4px; }
+    #cv-preview .ftable td.fr { width: 18%; text-align: right; font-size: 7.9pt; font-weight: 600; white-space: nowrap; padding-bottom: 4px; padding-top: 1px; }
+    #cv-preview .fdeg { font-size: 8pt; font-weight: 700; text-transform: uppercase; line-height: 1.3; }
+    #cv-preview .fsch { font-size: 7.6pt; font-style: italic; }
+    #cv-preview .ptitle { font-size: 8pt; font-weight: 700; margin-top: 3px; margin-bottom: 1px; }
+    #cv-preview .ptitle:first-child { margin-top: 0; }
+    #cv-preview .lang-line { font-size: 7.9pt; line-height: 1.5; }
+    #cv-preview .lang-line b { font-weight: 700; }
+    #cv-preview .lang-line .sep { margin: 0 5px; color: #555; }
+
+    @media print {
+      body * { visibility: hidden; }
+      #cv-preview, #cv-preview * { visibility: visible; }
+      #cv-preview {
+        position: fixed;
+        top: 0; left: 0;
+        width: 210mm;
+        min-height: 297mm;
+        box-shadow: none;
+        padding: 9mm 13mm 8mm 13mm;
+        font-size: 8.4pt;
+      }
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">CV GENERATOR</div>
+  <div class="sub">Yohan MULUKA · Propulsé par Gemini</div>
+</div>
+
+<div class="container">
+
+  <!-- ══ PANNEAU GAUCHE ══ -->
+  <div class="panel-left">
+
+    <!-- Clé API -->
+    <div class="panel-section">
+      <h3>Clé API Gemini</h3>
+      <div class="api-input-wrap">
+        <input type="password" id="api-key" placeholder="AIza..." autocomplete="off"/>
+        <button class="btn-save" onclick="saveKey()">Sauver</button>
+      </div>
+      <div class="api-status" id="api-status">Clé non configurée</div>
+      <div class="info-box" style="margin-top:10px;">
+        Obtiens ta clé gratuite sur <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a>.<br/>
+        Elle est sauvegardée uniquement dans ton navigateur (localStorage).
+      </div>
+    </div>
+
+    <!-- Fiche de poste -->
+    <div class="panel-section" style="flex:1;">
+      <h3>Fiche de poste</h3>
+      <textarea id="job-input" placeholder="Colle ici le texte complet de la fiche de poste..."></textarea>
+    </div>
+
+    <!-- Alerte éléments manquants -->
+    <div class="alert-box warning" id="alert-missing"></div>
+    <div class="alert-box error" id="alert-error"></div>
+
+    <!-- Bouton générer -->
+    <div class="panel-section">
+      <button class="btn-generate" id="btn-gen" onclick="generateCV()">
+        <span class="btn-text">Générer le CV adapté</span>
+        <div class="spinner"></div>
+      </button>
+    </div>
+
+  </div>
+
+  <!-- ══ PANNEAU DROIT ══ -->
+  <div class="panel-right">
+    <div class="preview-toolbar">
+      <span>Aperçu du CV</span>
+      <button class="btn-copy" id="btn-copy" onclick="copyHTML()" disabled>Copier HTML</button>
+      <button class="btn-print" id="btn-print" onclick="window.print()" disabled>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Exporter PDF
+      </button>
+    </div>
+    <div class="preview-wrap">
+      <div id="cv-preview">
+        <div class="placeholder-msg">
+          <div class="icon">📄</div>
+          <p>Le CV généré apparaîtra ici</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ══ BASE DE COMPÉTENCES ══
+const BASE_COMPETENCES = `
+FORMATION :
+- Cycle Ingénieur Informatique — EPITA (2026–2029, admis)
+- Bachelor Informatique et Projets Numériques (alternance) — ISEP (2023–2026)
+- PASS — Université Paris Cité (2021–2022)
+- Bac Maths & SVT — Lycée Saint Michel de Picpus (2020–2021)
+- Moyennes : B1 → 14,75 | B2 → 14,90 | TOEIC : 905/990
+
+EXPÉRIENCES :
+1. Customer Support Engineer — Alternance | Everysens (SaaS Transport Ferroviaire) | Oct. 2024 – Août 2026
+   - Application web Python/Streamlit pour intégration de données par équipes non-techniques → ÷4 sur le temps de traitement client
+   - Contrôles automatiques de qualité data, alertes temps réel, dashboards de suivi d'incidents
+   - Requêtes SQL pour extraction et organisation de données issues de capteurs connectés
+   - Intégration API REST (TVMS) avec authentification Auth0 M2M via Postman
+   - Architecture modulaire Python (ETL, config, validators, payloads, utils)
+   - Mode dry-run, notifications Slack, logging CSV, gestion multi-environnements (staging/prod/review)
+   - Consolidation de 25+ notebooks Google Colab en une interface unifiée
+   - Documentation Confluence, tickets Jira, fichiers de suivi Excel (COUNTIF, SUM multi-onglets)
+   - Workflow Git/GitHub sur repo dédié
+   - Gestion de credentials multi-tenant, pipeline de géocodage (geofences)
+
+2. Développeur Web Freelance | Meganmuluka.fr | Mars 2025 – Mars 2026
+   - Site web pour praticienne de santé, automatisation prise en charge patients
+   - Connexion à services tiers, conformité RGPD
+
+3. Chargé de Projets Digitaux & Optimisation IT | Sattel Energy (Kinshasa) | Juin – Sept. 2024
+   - Analyse de processus, identification de tâches répétitives → +20% de productivité
+   - Déploiement d'automatisations et d'outils digitaux (plateforme web + applications)
+
+COMPÉTENCES TECHNIQUES :
+- Langages : Python (Pandas, Streamlit, ETL) — maîtrise | SQL — maîtrise | Java — bases | Réseaux — bases | C++/Arduino — initiation
+- Data & BI : Power BI (notions), Dashboards, Excel (COUNTIF, SUM), Google Sheets, SAP HANA (appétence), Dataiku (intérêt)
+- APIs & Intégrations : REST API, Postman (usage pro), Auth0 M2M, Slack API
+- Qualité Data & Gouvernance : Data Quality, contrôle d'intégrité, RGPD, documentation technique, méthode 5S Data
+- Gestion de projet : Agile/Scrum, Jira, Confluence, recueil de besoins, cahiers des charges
+- Outils & Systèmes : Git/GitHub, Linux/Windows, Suite Office 365, IoT (ESP32, MPU-6050, NEO-6M GPS)
+
+PROJETS ACADÉMIQUES :
+- Détection d'anomalies routières IoT (2026) — ESP32 + MPU-6050 + GPS, précision 80%, budget <150€
+- Data et Environnement (2024) — Système IoT capteurs température/qualité de l'air
+- Hackathon FOOTBAR (Déc. 2023) — Interface graphique pour capteur de performances sportives
+- TP CMOS 28nm FDSOI — STMicroelectronics, optimisation dopage transistors
+- ACV (2024) — Analyse de Cycle de Vie SNCF Connect vs IDF Mobilités
+
+ACTIVITÉS :
+- Sports Manager — AS ISEP (sponsoring, organisation événements multi-sports)
+- Escrime — niveau national
+- Permis B + moto
+`;
+
+const PROMPT_SYSTEM = `Tu es un expert en recrutement français et en optimisation de CV pour les ATS (Applicant Tracking Systems).
+
+BASE DE COMPÉTENCES DE YOHAN MULUKA (tu ne peux utiliser QUE ces éléments, zéro invention) :
+${BASE_COMPETENCES}
+
+RÈGLES ABSOLUES :
+1. N'utilise QUE les éléments listés dans la base de compétences. Zéro invention, zéro compétence ajoutée.
+2. Si un élément de la fiche de poste ne correspond à rien dans la base, signale-le dans la section "ÉLÉMENTS_MANQUANTS".
+3. Réorganise et priorise les éléments selon leur pertinence pour le poste.
+4. Reprends les mots-clés exacts de la fiche de poste partout où c'est naturel et légitime.
+5. Reformule les bullets pour maximiser le score ATS.
+6. Adapte le titre et l'accroche au poste visé.
+7. N'utilise JAMAIS de tirets longs " — " dans le texte des bullets ou de l'accroche. Utilise des formulations naturelles à la place.
+8. Le style doit être professionnel, sobre, sans formulations qui sonnent "IA".
+
+INFORMATIONS FIXES (toujours inclure telles quelles) :
+- Nom : Yohan MULUKA
+- Téléphone : +33 6 37 10 99 54
+- Email : YOHAN.MULUKA@EPITA.FR
+- Localisation : Île-de-France
+- Permis B
+- Contrat : Contrat d'apprentissage : 36 mois – Rythme : 2 sem. / 2 sem. – Dès septembre 2026
+
+FORMAT DE RÉPONSE (JSON strict) :
+{
+  "titre_poste": "...",
+  "accroche": "...",
+  "experiences": [
+    {
+      "role": "...",
+      "entreprise": "...",
+      "periode": "...",
+      "bullets": ["...", "..."]
+    }
+  ],
+  "competences": [
+    { "label": "...", "contenu": "..." }
+  ],
+  "projets": [
+    { "titre": "...", "bullet": "..." }
+  ],
+  "langues_ligne1": "...",
+  "centres_interet": "...",
+  "elements_manquants": ["...", "..."]
+}`;
+
+// ══ INIT ══
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('gemini_api_key');
+  if (saved) {
+    document.getElementById('api-key').value = saved;
+    document.getElementById('api-status').textContent = 'Clé configurée';
+    document.getElementById('api-status').className = 'api-status ok';
+  }
+});
+
+function saveKey() {
+  const key = document.getElementById('api-key').value.trim();
+  if (!key) return;
+  localStorage.setItem('gemini_api_key', key);
+  document.getElementById('api-status').textContent = 'Clé sauvegardée';
+  document.getElementById('api-status').className = 'api-status ok';
+}
+
+// ══ GÉNÉRATION ══
+async function generateCV() {
+  const apiKey = localStorage.getItem('gemini_api_key') || document.getElementById('api-key').value.trim();
+  const jobText = document.getElementById('job-input').value.trim();
+
+  // Validations
+  document.getElementById('alert-error').style.display = 'none';
+  document.getElementById('alert-missing').style.display = 'none';
+
+  if (!apiKey) {
+    showError('Veuillez entrer et sauvegarder votre clé API Gemini.');
+    return;
+  }
+  if (!jobText) {
+    showError('Veuillez coller le texte de la fiche de poste.');
+    return;
+  }
+
+  // UI loading
+  const btn = document.getElementById('btn-gen');
+  btn.classList.add('loading');
+  btn.disabled = true;
+
+  try {
+    const prompt = `Voici la fiche de poste :\n\n${jobText}\n\nGénère le CV adapté en JSON selon le format demandé.`;
+
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          system_instruction: { parts: [{ text: PROMPT_SYSTEM }] },
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            temperature: 0.3,
+            responseMimeType: "application/json"
+          }
+        })
+      }
+    );
+
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.error?.message || `Erreur API (${response.status})`);
+    }
+
+    const data = await response.json();
+    const raw = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!raw) throw new Error('Réponse vide de l\'API.');
+
+    const cv = JSON.parse(raw);
+    renderCV(cv);
+
+    // Afficher éléments manquants
+    if (cv.elements_manquants && cv.elements_manquants.length > 0) {
+      const missing = cv.elements_manquants.filter(e => e && e.trim());
+      if (missing.length > 0) {
+        const box = document.getElementById('alert-missing');
+        box.innerHTML = '<strong>Éléments de la fiche sans correspondance dans ta base (non ajoutés) :</strong><br/>' +
+          missing.map(e => '• ' + e).join('<br/>');
+        box.style.display = 'block';
+      }
+    }
+
+    document.getElementById('btn-print').disabled = false;
+    document.getElementById('btn-copy').disabled = false;
+
+  } catch (e) {
+    showError('Erreur : ' + e.message);
+  } finally {
+    btn.classList.remove('loading');
+    btn.disabled = false;
+  }
+}
+
+// ══ RENDU HTML DU CV ══
+function renderCV(cv) {
+  const expHTML = cv.experiences.map(exp => `
+    <div class="exp-block">
+      <div class="exp-role">${exp.role}</div>
+      <div class="exp-meta"><em>${exp.entreprise}</em> &nbsp;|&nbsp; <b>${exp.periode}</b></div>
+      <ul class="bul">
+        ${exp.bullets.map(b => `<li>${b}</li>`).join('')}
+      </ul>
+    </div>
+  `).join('');
+
+  const compHTML = cv.competences.map(c =>
+    `<li><b>${c.label} :</b> ${c.contenu}</li>`
+  ).join('');
+
+  const projHTML = cv.projets.map(p => `
+    <div class="ptitle">${p.titre}</div>
+    <ul class="bul"><li>${p.bullet}</li></ul>
+  `).join('');
+
+  const html = `
+    <div class="cv-header">
+      <h1>Yohan <span class="ln">MULUKA</span></h1>
+      <div class="title">${cv.titre_poste}</div>
+      <div class="contract">Contrat d'apprentissage : 36 mois – Rythme : 2 sem. / 2 sem. – Dès septembre 2026</div>
+      <div class="contact">
+        +33 6 37 10 99 54
+        <span>|</span> YOHAN.MULUKA@EPITA.FR
+        <span>|</span> Île-de-France
+        <span>|</span> Permis B
+      </div>
+      <hr class="hline"/>
+    </div>
+
+    <p class="accroche">${cv.accroche}</p>
+
+    <div class="section">
+      <div class="section-title">Expériences Professionnelles</div>
+      ${expHTML}
+    </div>
+
+    <div class="section">
+      <div class="section-title">Formations</div>
+      <table class="ftable">
+        <tr>
+          <td class="fl"><div class="fdeg">Cycle Ingénieur en Informatique (En préparation)</div><div class="fsch">EPITA – École d'Ingénieurs en Informatique – Paris</div></td>
+          <td class="fr">2026 – 2029</td>
+        </tr>
+        <tr>
+          <td class="fl"><div class="fdeg">Bachelor Informatique et Projets Numériques (En alternance)</div><div class="fsch">ISEP – École d'Ingénieurs du Numérique – Paris</div></td>
+          <td class="fr">2023 – 2026</td>
+        </tr>
+        <tr>
+          <td class="fl"><div class="fdeg">PASS – Parcours Accès Santé Spécifique</div><div class="fsch">Université de Paris Cité</div></td>
+          <td class="fr">2021 – 2022</td>
+        </tr>
+        <tr>
+          <td class="fl"><div class="fdeg">Baccalauréat – Spécialités Mathématiques et SVT</div><div class="fsch">Lycée Saint Michel de Picpus – Paris</div></td>
+          <td class="fr">2020 – 2021</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Compétences Techniques</div>
+      <ul class="bul">${compHTML}</ul>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Projets Académiques</div>
+      ${projHTML}
+    </div>
+
+    <div class="section">
+      <div class="section-title">Langues</div>
+      <div class="lang-line">${cv.langues_ligne1}</div>
+      <div class="lang-line" style="margin-top:2px;"><b>Centres d'intérêt :</b> ${cv.centres_interet}</div>
+    </div>
+  `;
+
+  document.getElementById('cv-preview').innerHTML = html;
+}
+
+function showError(msg) {
+  const box = document.getElementById('alert-error');
+  box.textContent = msg;
+  box.style.display = 'block';
+}
+
+function copyHTML() {
+  const html = document.getElementById('cv-preview').innerHTML;
+  navigator.clipboard.writeText(html).then(() => {
+    const btn = document.getElementById('btn-copy');
+    btn.textContent = 'Copié !';
+    setTimeout(() => btn.textContent = 'Copier HTML', 2000);
+  });
+}
+</script>
+</body>
+</html>
